@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.oregon-permit-app/questions.schema.json",
+  "title": "OregonPermitQuestionBank",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "manualEdition", "manualUrl", "questions"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "manualEdition": { "const": "2026-2027" },
+    "manualUrl": { "const": "https://www.oregon.gov/odot/forms/dmv/37.pdf" },
+    "questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/question" }
+    }
+  },
+  "$defs": {
+    "topicId": {
+      "enum": [
+        "signs",
+        "speed-limits",
+        "right-of-way",
+        "turns-and-lanes",
+        "parking",
+        "alcohol-and-phone",
+        "school-buses",
+        "teen-gdl"
+      ]
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "topic",
+        "prompt",
+        "choices",
+        "correctIndex",
+        "explanation",
+        "manual",
+        "verified"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^q-[a-z0-9-]+-[0-9]{3}$" },
+        "topic": { "$ref": "#/$defs/topicId" },
+        "prompt": { "type": "string", "minLength": 8, "maxLength": 400 },
+        "choices": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 4,
+          "items": { "type": "string", "minLength": 1, "maxLength": 220 }
+        },
+        "correctIndex": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "explanation": { "type": "string", "minLength": 8, "maxLength": 240 },
+        "manual": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["edition", "section", "page", "url"],
+          "properties": {
+            "edition": { "const": "2026-2027" },
+            "section": { "type": "string", "minLength": 3 },
+            "page": { "type": "integer", "minimum": 1, "maximum": 96 },
+            "url": { "const": "https://www.oregon.gov/odot/forms/dmv/37.pdf" }
+          }
+        },
+        "signImage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src", "alt", "source", "attribution"],
+          "properties": {
+            "src": { "type": "string", "pattern": "^/signs/.+\\.(svg|png)$" },
+            "alt": { "type": "string", "minLength": 3, "maxLength": 160 },
+            "source": { "enum": ["fhwa-shs", "wikimedia-pd-usgov-mutcd"] },
+            "attribution": { "type": "string", "minLength": 8 },
+            "mutcdCode": { "type": "string" }
+          }
+        },
+        "verified": { "type": "boolean" },
+        "verifiedAgainst": { "type": "string" }
+      }
+    }
+  }
+}
